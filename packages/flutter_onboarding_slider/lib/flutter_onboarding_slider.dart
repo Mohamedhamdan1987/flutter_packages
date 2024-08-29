@@ -60,6 +60,9 @@ class OnBoardingSlider extends StatefulWidget {
   /// Color of the bottom page indicators.
   final Color? controllerColor;
 
+  /// Color of the whole screen apart from the NavigationBar.
+  final Color? backgroundColor;
+
   /// Toggle bottom button.
   final bool addButton;
 
@@ -90,7 +93,10 @@ class OnBoardingSlider extends StatefulWidget {
   final bool hasSkip;
 
   /// icon on the skip button
-  final Icon skipIcon;
+  final Widget skipWidget;
+
+  /// icon on the skip button
+  final Widget nextWidget;
 
   /// is the indicator located on top of the screen
   final bool indicatorAbove;
@@ -116,6 +122,7 @@ class OnBoardingSlider extends StatefulWidget {
     this.finishButtonStyle,
     this.finishButtonText,
     this.controllerColor,
+    this.backgroundColor,
     this.addController = true,
     this.centerBackground = false,
     this.addButton = true,
@@ -129,7 +136,11 @@ class OnBoardingSlider extends StatefulWidget {
       fontSize: 20,
       color: Colors.white,
     ),
-    this.skipIcon = const Icon(
+    this.skipWidget = const Icon(
+      Icons.exit_to_app,
+      color: Colors.white,
+    ),
+    this.nextWidget = const Icon(
       Icons.arrow_forward,
       color: Colors.white,
     ),
@@ -158,21 +169,25 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
       create: (BuildContext context) => PageOffsetNotifier(_pageController),
       child: Scaffold(
         backgroundColor: widget.pageBackgroundColor ?? null,
-        floatingActionButton: widget.hasFloatingButton
-            ? BackgroundFinalButton(
-                buttonTextStyle: widget.finishButtonTextStyle,
-                skipIcon: widget.skipIcon,
-                addButton: widget.addButton,
-                currentPage: _currentPage,
-                pageController: _pageController,
-                totalPage: widget.totalPage,
-                onPageFinish: widget.onFinish,
-                finishButtonStyle: widget.finishButtonStyle,
-                buttonText: widget.finishButtonText,
-                hasSkip: widget.hasSkip,
-              )
+        bottomNavigationBar: widget.hasFloatingButton
+            ? Padding(padding: EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+          child: BackgroundFinalButton(
+            buttonTextStyle: widget.finishButtonTextStyle,
+            skipWidget: widget.skipWidget,
+            nextWidget: widget.nextWidget,
+            onSkip : _onSkip,
+            addButton: widget.addButton,
+            currentPage: _currentPage,
+            pageController: _pageController,
+            totalPage: widget.totalPage,
+            onPageFinish: widget.onFinish,
+            finishButtonStyle: widget.finishButtonStyle,
+            buttonText: widget.finishButtonText,
+            hasSkip: widget.hasSkip,
+          ),)
             : SizedBox.shrink(),
         body: CupertinoPageScaffold(
+          backgroundColor: widget.backgroundColor,
           navigationBar: OnBoardingNavigationBar(
             skipFunctionOverride: widget.skipFunctionOverride,
             leading: widget.leading,
@@ -200,7 +215,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
                 speed: widget.speed,
                 totalPage: widget.totalPage,
                 child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
@@ -213,14 +228,15 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
                       ),
                       widget.addController
                           ? BackgroundController(
-                              hasFloatingButton: widget.hasFloatingButton,
-                              indicatorPosition: widget.indicatorPosition,
-                              indicatorAbove: widget.indicatorAbove,
-                              currentPage: _currentPage,
-                              totalPage: widget.totalPage,
-                              controllerColor: widget.controllerColor,
-                            )
+                        hasFloatingButton: widget.hasFloatingButton,
+                        indicatorPosition: widget.indicatorPosition,
+                        indicatorAbove: widget.indicatorAbove,
+                        currentPage: _currentPage,
+                        totalPage: widget.totalPage,
+                        controllerColor: widget.controllerColor,
+                      )
                           : SizedBox.shrink(),
+
                     ]),
               ),
             ),
